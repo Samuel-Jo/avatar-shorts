@@ -67,7 +67,7 @@ render 가 plan(원본) → 편집 시간으로 옮긴다. 그래서 edit.json �
 ## 코드 지도
 - `src/Short.tsx` 메인 컴포지션 (plan 하나 = 영상 하나), `src/Root.tsx` 크기·길이 계산
 - `src/layouts/` Vertical(1080×1920, 분할/머리 위·아래 카드/컷어웨이/아바타 확대 퇴장) · framing.js(머리 위치 → 아바타·판·카드·자막 자리, render 검사와 공용) · Side(1920×1080, 아바타 카드 또는 배경 지운 진행자(matte) — chapter 마다 좌우 바꿈, sideSwap.js) · Avatar(펀치인) · SceneHost
-- `src/scenes/` 템플릿 12종, `src/custom/` 커스텀 장면(StackCarousel · TypeSpecimen · LightBloom · OrbitIdea · FlowDiagram 흐름도), `src/kit/` 부품(motion, theme, Backdrop, Object3D, KText, Parts, Gradient)
+- `src/scenes/` 템플릿 12종, `src/custom/` 커스텀 장면(StackCarousel · TypeSpecimen · LightBloom · OrbitIdea · FlowDiagram 흐름도 · CoinVault 돈이 쌓임 · TwinVault 같은 돈 다른 결과), `src/kit/` 부품(motion, theme, Backdrop, Object3D, KText, Parts, Gradient, Iso 2.5D 상자·금고·동전)
 - `src/captions/Captions.tsx` 자막
 - `scripts/` new-project · probe · face · matte(배경 지우기) · transcribe · align · edit · words · chapters(롱폼 챕터) · style · me(내 취향) · reference(레퍼런스 측정) · timeline · variety(장면 지문·다양성 검사) · render · still · storyboard · look · doctor · selftest · sfx · setup · platform(OS 차이) · py(파이썬 실행기)
 - `examples/demo/` 템플릿 데모 plan · `examples/avatar-v01/` 실제 영상 하나의 전 과정 파일

@@ -104,6 +104,8 @@ chapter 가 3개 이상이면 장 카드 아래에 **길 지도**가 자동으�
 | `TypeSpecimen` | 글꼴·서체를 말할 때 (panel). 글꼴 이름을 그 글꼴로 쓴 카드가 차례로 | `{"items": [{"sample": "얇은 명조", "font": "myeongjo", "label": "고급스럽게", "at": 16.76}, {"sample": "고딕", "font": "sans", "weight": 800}, {"sample": "손글씨", "font": "hand"}]}` |
 | `LightBloom` | "빛이 번지죠" 같은 화면 전환을 말할 때 | `{"from": "picture", "to": "star", "bloomAt": 12.3}` |
 | `OrbitIdea` | 중심 개념 + 주변 요소 | `{"center": "bulb", "satellites": ["chat", "rocket", "target"]}` |
+| `CoinVault` | 돈이 **어딘가에 모여 쌓인다** (충전금·예치금·적립금). 2.5D 카드 더미에서 동전이 포물선으로 날아가 유리 금고에 쌓이고 금 층이 차오른다. 말한 숫자는 알약 하나로. 크림 바탕 (EP01 v2, 사용자 선택) | `{"flowAt": 76.85, "flowUntil": 78.3, "fill": 0.74, "source": "충전한 돈", "target": "선수금", "pill": {"text": "4,276억 원", "at": 78.34}}` — 이름표 8자 이하, cutaway 권장 |
+| `TwinVault` | **같은 돈, 다른 결과** 비교 (이자가 붙는 곳 vs 안 붙는 곳). 같은 금고 둘에 돈이 들어가고 왼쪽만 이자 동전이 솟아 쌓인다. 글자 비교 카드(compare) 대신 | `{"left": {"label": "은행", "at": 140.16}, "right": {"label": "스타벅스 카드", "at": 142.74}, "interestAt": 141.32, "noneAt": 148.02, "noneText": "이자 없음"}` — panel·cutaway |
 | `FlowDiagram` | 돈·물건·정보가 **어디서 어디로** 가는지, 원인 → 결과 (panel·cutaway, 가로·세로). 노드가 차례로 뜨고 선이 그려진 뒤 강조색 점이 흐름. `shape: "loop"` 면 마지막이 처음으로 돌아오는 순환. 노드 3~4개(5개 이하), 노드 글자 2~8자 | `{"title": "충전금이 *매출*이 되기까지", "nodes": [{"text": "앱에서 충전", "object": "mobile", "at": 6.3}, {"text": "스타벅스 통장", "object": "money-bag"}, {"text": "커피 받으면 매출", "object": "cup", "accent": true}], "edges": [{"from": 0, "to": 1, "label": "현금 먼저"}, {"from": 1, "to": 2}]}` — edges 를 비우면 순서대로 잇는다. 시각은 nodes[].at · edges[].at (원본 초, 없으면 0.6초 간격) |
 
 ### 장면 카메라 — 멈춰 있지 않게 (모든 템플릿)
