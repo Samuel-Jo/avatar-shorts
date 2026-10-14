@@ -65,7 +65,7 @@ const {w, h, u, wide, kind} = useStage(); // 무대 크기, u=기준 스케일(�
 
 ## Remotion 규칙 (렌더가 깨지지 않게)
 - 모든 움직임은 프레임의 함수: `spring`, `interpolate` 만. **CSS transition / @keyframes / setTimeout / Math.random 금지** (랜덤은 `random('seed')`).
-- 이미지는 `<Img>`, 영상은 `<OffthreadVideo>`, 파일은 `staticFile('objects/…')`.
+- 이미지는 `<Img>`, 영상은 `@remotion/media` 의 `<Video objectFit="cover">` (`<OffthreadVideo>` 는 메모리가 모자라면 롱폼 렌더가 "No frame found" 로 멈춤), 파일은 `staticFile('objects/…')`.
 - `interpolate` 입력 범위는 반드시 증가 순서. 짧은 장면에서 겹치지 않게 `Math.min` 으로 보호.
 - 글꼴은 이미 로드됨 (`FONT.sans` 등). 외부 URL 폰트·CDN 금지 (오프라인 렌더).
 - 한글은 `wordBreak: 'keep-all'`.
