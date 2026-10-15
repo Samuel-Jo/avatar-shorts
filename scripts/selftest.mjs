@@ -384,9 +384,14 @@ test('롱폼: 조각 160개 (필터 그래프 3만 자+) 도 편집됨 — 그�
   const r = sh(process.execPath, ['scripts/py.mjs', 'edit', L]);
   const segs = fs.existsSync(path.join(L, 'cuts.json')) ? json(path.join(L, 'cuts.json')).segments.length : 0;
   const graph = fs.existsSync(path.join(L, '.filter_graph.txt')) ? fs.statSync(path.join(L, '.filter_graph.txt')).size : 0;
+  // 예전: 초를 소수 4자리로 잘라 조각마다 프레임이 하나씩 더 붙어 80조각에 0.7초가 밀렸다 → 마지막 "주세요" 가 잘림 (ep02-long)
+  const plan = fs.existsSync(path.join(L, 'cuts.json')) ? json(path.join(L, 'cuts.json')).duration : 0;
+  const real = (k) => parseFloat(sh('ffprobe', ['-v', 'error', '-select_streams', k, '-show_entries', 'stream=duration', '-of', 'csv=p=0', path.join(L, 'edit.mp4')]).out);
+  const [vd, ad] = fs.existsSync(path.join(L, 'edit.mp4')) ? [real('v:0'), real('a:0')] : [0, 0];
   fs.rmSync(L, {recursive: true, force: true});
   must(r.code === 0, r.out.trim().split('\n').slice(-2).join(' | '));
   must(segs >= n * 0.9, `조각 ${segs}개 (무음이 안 잘림)`);
+  must(Math.abs(vd - plan) < 0.05 && Math.abs(ad - plan) < 0.06, `편집본이 계획(cuts ${plan}s)과 어긋남: 영상 ${vd}s · 소리 ${ad}s — 조각이 프레임 격자에서 밀린다`);
   must(graph > 32000, `그래프 파일 ${graph}바이트 — 한도를 넘는 경우를 시험하지 못함`);
 });
 

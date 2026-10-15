@@ -67,7 +67,7 @@ render 가 plan(원본) → 편집 시간으로 옮긴다. 그래서 edit.json �
 ## 코드 지도
 - `src/Short.tsx` 메인 컴포지션 (plan 하나 = 영상 하나), `src/Root.tsx` 크기·길이 계산
 - `src/layouts/` Vertical(1080×1920, 분할/머리 위·아래 카드/컷어웨이/아바타 확대 퇴장) · framing.js(머리 위치 → 아바타·판·카드·자막 자리, render 검사와 공용) · Side(1920×1080, 아바타 카드 또는 배경 지운 진행자(matte) — chapter 마다 좌우 바꿈, sideSwap.js) · Avatar(펀치인) · SceneHost
-- `src/scenes/` 템플릿 12종, `src/custom/` 커스텀 장면(StackCarousel · TypeSpecimen · LightBloom · OrbitIdea · FlowDiagram 흐름도 · CoinVault 돈이 쌓임 · TwinVault 같은 돈 다른 결과), `src/kit/` 부품(motion, theme, Backdrop, Object3D, KText, Parts, Gradient, Iso 2.5D 상자·금고·동전)
+- `src/scenes/` 템플릿 12종, `src/custom/` 커스텀 장면(StackCarousel · TypeSpecimen · LightBloom · OrbitIdea · FlowDiagram 흐름도 · CoinVault 돈이 쌓임 · CoinSplit 돈이 갈라져 나감 · TwinVault 같은 돈 다른 결과), `src/kit/` 부품(motion, theme, Backdrop, Object3D, KText, Parts, Gradient, Iso 2.5D 상자·금고·동전)
 - `src/captions/Captions.tsx` 자막
 - `scripts/` new-project · probe · face · matte(배경 지우기) · transcribe · align · edit · words · chapters(롱폼 챕터) · style · me(내 취향) · reference(레퍼런스 측정) · timeline · variety(장면 지문·다양성 검사) · render · still · storyboard · look · doctor · selftest · sfx · setup · platform(OS 차이) · py(파이썬 실행기)
 - `examples/demo/` 템플릿 데모 plan · `examples/avatar-v01/` 실제 영상 하나의 전 과정 파일
@@ -118,4 +118,5 @@ render 가 plan(원본) → 편집 시간으로 옮긴다. 그래서 edit.json �
 - 가로 화면의 아바타 카드(회색 배경 그대로)가 "증명사진 같아 어색하다" (ep01-long) → `npm run matte` 로 배경을 지운 투명 영상(VP9 알파, 소리 포함)을 만들면 `Side.tsx` 가 카드 대신 사람만 화면 아래에 붙여 세운다. 세로 쇼츠는 배치(framing)는 그대로 두고 회색 배경만 Backdrop 으로 (`Avatar.tsx` 가 원본에서 잘라 낸 자리에 사람만 그린다). 단색 배경 전용 (배경과의 색 거리 + 바닥에 닿는 덩어리 + 구멍 메우기 — 흰 셔츠 깃이 배경색과 비슷해서). 편집본을 다시 만들면 render 가 다시 만들라고 막는다.
 - 세로 쇼츠가 위 120·아래 250px 만 비우고 오른쪽 버튼 열(좋아요·댓글·공유)은 몰라서, 자막이 제목·채널 자리에, 카드 끝이 버튼 밑에 깔렸다 (ep01 쇼츠, 사용자 지적) → `framing.js FRAME` 이 위 180·아래 420·오른쪽 190(y 880 아래) 을 비우고, 자막은 x 60~880, 컷어웨이 무대는 오른쪽 열을 뺀 폭. 얼굴이 크면 얼굴만일 때도 아바타를 올린다 (`frameAt` 은 얼굴 배치에서 출발). 위를 240 으로 비웠더니 판이 납작해져 판 글자가 반 크기 → 판은 780px 아래로 줄이지 않고(아바타를 0.66 까지 줄임) 판 무대 기준 높이 760 (`stage.ts`).
 - 장면이 처음 1초에 다 뜨고 나머지는 멈춰 있어 PPT 처럼 보였다, 자막은 한 줄이 통째로 뜨고, 장 카드는 장마다 따로 놀았다 (ep01, 온돌 롱폼과 비교) → 장면마다 느린 줌인(취향 `broll.camera`) + 세부를 말할 때 장면 `camera: {at, x, y, scale}` 로 다가가기 (`SceneHost.tsx`), 4초 넘는 장면의 등장이 앞 35% 에 몰리면 ⚠️ (`timeline.mjs frontLoaded`), 노래방식 자막 (render 가 words.json 의 단어 시각을 `cue.w` 로, `Captions.tsx`), chapter 3개 이상이면 장 카드마다 같은 길 지도 (`props.label`, `chapters.mjs addRoad`).
+- 롱폼 끝 "눌러주세요" 가 "눌러" 에서 잘렸다 (ep02-long). 편집이 조각 경계를 초(소수 4자리)로 넘겨 1/30 격자에서 살짝 어긋나 조각마다 프레임이 하나 더 붙고, concat 은 소리를 긴 쪽에 맞춰 늘려 80조각에 0.7초가 밀렸다 (자막·장면은 계획 시각이라 소리보다 앞서 감, ep01 롱폼도 0.5초) → `edit.py` 가 `trim=start_frame/end_frame` · `atrim=start_sample/end_sample` 로 자르고, 원본 소리가 영상보다 길면(DeepBrain 0.17초) 영상 길이까지만.
 - 새 함정을 고치면 `scripts/selftest.mjs` 에 시험 한 줄, 이 목록에 한 줄.
