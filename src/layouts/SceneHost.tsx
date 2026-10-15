@@ -35,9 +35,9 @@ const CameraRig: React.FC<{start: number; end: number; drift: number; camera?: S
     ty = (0.5 - camera.y) * 50 * c;
   }
   if (s === 1 && !tx && !ty) return <>{children}</>;
-  return (
-    <div style={{position: 'absolute', inset: 0, transform: `translate(${tx}%, ${ty}%) scale(${s})`, transformOrigin: origin}}>{children}</div>
-  );
+  const moved = <div style={{position: 'absolute', inset: 0, transform: `translate(${tx}%, ${ty}%) scale(${s})`, transformOrigin: origin}}>{children}</div>;
+  // 다가가기(camera)는 무대 밖으로 넘치지 않게 자른다 — 세로 위 판에서 1.4배로 당겼더니 계단이 판 아래 아바타 위까지 내려왔다 (ep04-s1)
+  return camera ? <div style={{position: 'absolute', inset: 0, overflow: 'hidden'}}>{moved}</div> : moved;
 };
 
 /** 장면 하나를 원본 시간 [in, out] 에 올려놓는다. 템플릿은 원본 기준 초를 그대로 쓴다. */

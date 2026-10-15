@@ -2,6 +2,7 @@ import type React from 'react';
 import {CoinSplit} from './CoinSplit';
 import {CoinVault} from './CoinVault';
 import {FlowDiagram} from './FlowDiagram';
+import {StepGauge} from './StepGauge';
 import {TwinVault} from './TwinVault';
 import {LightBloom} from './LightBloom';
 import {OrbitIdea} from './OrbitIdea';
@@ -20,4 +21,5 @@ export const CUSTOM: Record<string, React.FC<any>> = {
   CoinVault,
   CoinSplit,
   TwinVault,
+  StepGauge,
 };

@@ -106,7 +106,7 @@ export const KText: React.FC<{
                     fontStyle: 'normal',
                   }}
                 >
-                  {tok.text}
+                  {isSerif ? <SansDigits text={tok.text} /> : tok.text}
                 </span>
               </span>
             );
@@ -115,6 +115,13 @@ export const KText: React.FC<{
       ))}
     </div>
   );
+};
+
+/** 세리프 강조 안의 숫자는 고딕으로: Instrument Serif 의 1 이 l 처럼 보여 '112만' 이 'l12만', '1+1' 이 'l+l' 로 읽혔다 (ep03·ep04) */
+export const DIGITS = /([0-9][0-9,.%+~]*)/;
+export const SansDigits: React.FC<{text: string; size?: string}> = ({text, size = '0.93em'}) => {
+  if (!DIGITS.test(text)) return <>{text}</>;
+  return <>{text.split(DIGITS).map((p, i) => (i % 2 ? <span key={i} style={{fontFamily: FONT.sans, fontWeight: 800, fontSize: size}}>{p}</span> : p))}</>;
 };
 
 type Tok = {text: string; kind: 'plain' | 'serif' | 'accent'};

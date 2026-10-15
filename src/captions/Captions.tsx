@@ -1,6 +1,7 @@
 import React from 'react';
 import {interpolate, useCurrentFrame, useVideoConfig} from 'remotion';
 import {fitSize} from '../kit/measure';
+import {DIGITS} from '../kit/KText';
 import {alpha, contrast, FONT, useTheme} from '../kit/theme';
 import type {Cue} from '../plan';
 
@@ -65,11 +66,10 @@ export const Captions: React.FC<{
 
 const TONE = {key: '', money: '#107C41', problem: '#C0271D'};
 
-// 1+1·2+1 같은 덤 행사 표기는 고딕으로: 큰 자막 세리프(Instrument Serif)의 1 이 l 처럼 보여 "l+l" 로 읽혔다 (ep03)
-const DEAL = /([1-3]\+[1-3])/;
+// 숫자는 고딕으로: 큰 자막 세리프(Instrument Serif)의 1 이 l 처럼 보여 '1+1' 이 'l+l', '112만' 이 'l12만' 으로 읽혔다 (ep03·ep04)
 const Deal: React.FC<{text: string}> = ({text}) => {
-  if (!DEAL.test(text)) return <>{text}</>;
-  return <>{text.split(DEAL).map((p, i) => (i % 2 ? <span key={i} style={{fontFamily: FONT.suit, fontWeight: 800}}>{p}</span> : p))}</>;
+  if (!DIGITS.test(text)) return <>{text}</>;
+  return <>{text.split(DIGITS).map((p, i) => (i % 2 ? <span key={i} style={{fontFamily: FONT.suit, fontWeight: 800}}>{p}</span> : p))}</>;
 };
 
 const Spans: React.FC<{cue: Cue; accent: string}> = ({cue, accent}) => {
