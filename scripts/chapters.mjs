@@ -9,7 +9,7 @@ import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {loadCuts, mapTime} from './timeline.mjs';
 
-const clean = (s) => String(s ?? '').replace(/[*+]/g, '').replace(/\s+/g, ' ').trim();
+const clean = (s) => String(s ?? '').replace(/\*(.+?)\*/g, '$1').replace(/_(.+?)_/g, '$1').replace(/\s+/g, ' ').trim(); // 강조 표시만 벗김 (1+1 의 + 는 글자, ep03)
 
 export const stamp = (sec) => {
   const s = Math.max(0, Math.floor(sec));

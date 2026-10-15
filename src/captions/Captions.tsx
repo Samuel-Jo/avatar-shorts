@@ -65,9 +65,16 @@ export const Captions: React.FC<{
 
 const TONE = {key: '', money: '#107C41', problem: '#C0271D'};
 
+// 1+1·2+1 같은 덤 행사 표기는 고딕으로: 큰 자막 세리프(Instrument Serif)의 1 이 l 처럼 보여 "l+l" 로 읽혔다 (ep03)
+const DEAL = /([1-3]\+[1-3])/;
+const Deal: React.FC<{text: string}> = ({text}) => {
+  if (!DEAL.test(text)) return <>{text}</>;
+  return <>{text.split(DEAL).map((p, i) => (i % 2 ? <span key={i} style={{fontFamily: FONT.suit, fontWeight: 800}}>{p}</span> : p))}</>;
+};
+
 const Spans: React.FC<{cue: Cue; accent: string}> = ({cue, accent}) => {
   const emph = (cue.emph ?? []).slice(0, 2);
-  if (!emph.length) return <>{cue.text}</>;
+  if (!emph.length) return <Deal text={cue.text} />;
   // 강조 텍스트를 원문에서 찾아 색칠
   const parts: {text: string; color?: string}[] = [];
   let rest = cue.text;
@@ -83,7 +90,7 @@ const Spans: React.FC<{cue: Cue; accent: string}> = ({cue, accent}) => {
     <>
       {parts.map((p, i) => (
         <span key={i} style={{color: p.color}}>
-          {p.text}
+          <Deal text={p.text} />
         </span>
       ))}
     </>
@@ -128,7 +135,7 @@ const Karaoke: React.FC<{cue: Cue; accent: string; look: Look; now: number}> = (
         return (
           <React.Fragment key={i}>
             {i ? ' ' : ''}
-            <span style={{display: 'inline-block', transform: pop !== 1 ? `scale(${pop})` : undefined, ...style}}>{tk.text}</span>
+            <span style={{display: 'inline-block', transform: pop !== 1 ? `scale(${pop})` : undefined, ...style}}><Deal text={tk.text} /></span>
           </React.Fragment>
         );
       })}

@@ -11,6 +11,7 @@ import {frontLoaded, remapScene} from './timeline.mjs';
 import {varietyProblems} from './variety.mjs';
 import {cutStage, fitFrame, FRAME, headBox} from '../src/layouts/framing.js';
 import {avatarSideAt, mirrorX, SWAP} from '../src/layouts/sideSwap.js';
+import {PY_ENV, VENV_PY} from './platform.mjs';
 
 const quick = process.argv.includes('--quick');
 // 이 PC 의 내 취향(style/me.json)이 시험 결과를 바꾸지 않게: 시험용 경로로 (자식 프로세스도 물려받는다)
@@ -144,6 +145,22 @@ test('자막 빨강 표시: -0원-입니다 처럼 조사가 붙어도 풀림, 2
   must('-0원-입니다.'.replace(pat, '[$1]') === '[0원]입니다.', '-0원-입니다 가 안 풀림');
   must(!pat.test('2020-2025년'), '2020-2025 범위를 빨강으로 바꿈');
 });
+test('자막 정렬: 대본의 1+1 을 "원 플러스 원" 소리와 맞춤', () => {
+  // 예전: "1+1" 을 "일플러스일" 로 비교해 아바타가 "원 플러스 원" 이라 읽은 곳이 못 맞춘 글자가 됐다 (ep03)
+  const code = 'import sys; sys.path.insert(0, "scripts"); from align import norm; print(norm("1+1에서"), norm("2+1"), norm("2020-1+10"))';
+  const r = sh(VENV_PY, ['-c', code], {env: PY_ENV});
+  must(r.out.trim() === '원플러스원에서 투플러스원 이영이영일플러스일영', r.out.trim());
+});
+test('자막: 1+1 덤 행사 표기는 고딕 (큰 자막 세리프 1 이 l 처럼 보임)', () => {
+  // 예전: 큰 자막(Instrument Serif)에서 "1+1" 이 "l+l" 로 읽혔다 (ep03 훅)
+  const src = fs.readFileSync('src/captions/Captions.tsx', 'utf8');
+  must(/const DEAL = /.test(src) && (src.match(/<Deal text=/g) ?? []).length >= 3, 'Deal 이 Spans·Karaoke 에 다 안 들어감');
+});
+test('hero: 오브젝트 뒤 카드는 오브젝트 칸 안에 (무대 고정 좌표 아님)', () => {
+  // 예전: 가로 무대에서 카드를 w*0.3 에 고정해, 제목이 길어 오브젝트가 왼쪽으로 밀리면 카드가 제목 첫 글자를 덮었다 (ep03-long)
+  const src = fs.readFileSync('src/scenes/basic.tsx', 'utf8');
+  must(/<GradientPanel x=\{objSize \/ 2\}/.test(src) && !/GradientPanel x=\{wide \? w \* 0\.3/.test(src), 'hero 뒤 카드가 무대 좌표에 고정됨');
+});
 test('음성 인식: GPU 라이브러리(cublas)가 없으면 CPU 로 다시 함', () => {
   // 예전: NVIDIA 그래픽카드는 있는데 CUDA 라이브러리가 없는 PC 에서 auto 가 GPU 를 골랐다가 "cublas64_12.dll is not found" 로 죽었다 (test-169)
   const src = fs.readFileSync('scripts/transcribe.py', 'utf8');
@@ -164,8 +181,8 @@ test('커스텀 장면이 전부 등록됨 (src/custom/index.ts)', () => {
 test('롱폼 챕터: chapter 장면(원본 시간) → 편집 시간 타임스탬프, 첫 줄 00:00, 10초 미만이면 ⚠️', () => {
   const cuts = {duration: 90, segments: [{src: [0, 10], out: [0, 10]}, {src: [20, 100], out: [10, 90]}]}; // 원본 10–20초가 잘림
   const ch = (id, t, num, title) => ({id, in: t, out: t + 2, mode: 'cutaway', template: 'chapter', props: {num, title}});
-  const {lines, warn} = chapterList({scenes: [ch('c', 80, '03', '셋째'), ch('a', 25.6, '01', '*첫째*'), ch('b', 60, '02', '둘째')]}, cuts);
-  must(lines.join('|') === '00:00 들어가며|00:15 01 첫째|00:50 02 둘째|01:10 03 셋째', lines.join('|'));
+  const {lines, warn} = chapterList({scenes: [ch('c', 80, '03', '셋째 _1+1_'), ch('a', 25.6, '01', '*첫째*'), ch('b', 60, '02', '둘째')]}, cuts);
+  must(lines.join('|') === '00:00 들어가며|00:15 01 첫째|00:50 02 둘째|01:10 03 셋째 1+1', lines.join('|'));
   must(!warn.length, warn.join(' / '));
   const short = chapterList({scenes: [ch('a', 25, '01', 'x'), ch('b', 30, '02', 'y')]}, cuts);
   must(short.warn.some((m) => /10초/.test(m)), '5초짜리 챕터를 알리지 않음');
