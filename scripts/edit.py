@@ -56,12 +56,22 @@ def run_style(slug):
 
 def probe(src):
     out = subprocess.run(
-        ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=r_frame_rate:format=duration", "-of", "json", str(src)],
+        ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=r_frame_rate,duration:format=duration", "-of", "json", str(src)],
         capture_output=True, encoding="utf-8", errors="replace", check=True,
     ).stdout
     d = json.loads(out)
     n, m = d["streams"][0]["r_frame_rate"].split("/")
-    return float(n) / float(m), float(d["format"]["duration"])
+    # 영상이 소리보다 짧으면(DeepBrain: 소리가 0.17초 더 김) 영상 길이까지만 — 넘긴 조각은 그림 없이 소리만 남는다
+    durs = [float(x) for x in (d["format"].get("duration"), d["streams"][0].get("duration")) if x not in (None, "N/A")]
+    return float(n) / float(m), min(durs)
+
+
+def audio_rate(src):
+    out = subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries", "stream=sample_rate", "-of", "csv=p=0", str(src)],
+        capture_output=True, encoding="utf-8", errors="replace", check=True,
+    ).stdout.strip()
+    return int(out or 48000)
 
 
 def silences(src, dur):
@@ -237,12 +247,17 @@ def main():
     # 6) 영상 자르기 (재인코딩, 경계마다 8ms 페이드로 '틱' 소리 방지)
     fade = pol.get("fadeMs", 8) / 1000
     parts, labels = [], []
+    # 프레임·샘플 번호로 자른다. 초를 소수 4자리로 넘기면 1/30 격자에서 살짝 어긋나 조각마다 프레임이 하나 더 붙거나 빠지고,
+    # concat 은 조각마다 긴 쪽(영상)에 맞춰 소리를 늘려서 80조각이면 0.7초가 밀렸다 → 끝 단어가 잘림 (ep02-long "눌러주세요")
+    sr = audio_rate(src)
     for i, sg in enumerate(segs):
         s, e = sg["src"]
         d = e - s
-        parts.append(f"[0:v]trim=start={s:.4f}:end={e:.4f},setpts=PTS-STARTPTS[v{i}]")
+        f0, f1 = round(s * fps), round(e * fps)
+        a0, a1 = round(f0 / fps * sr), round(f1 / fps * sr)
+        parts.append(f"[0:v]trim=start_frame={f0}:end_frame={f1},setpts=PTS-STARTPTS[v{i}]")
         parts.append(
-            f"[0:a]atrim=start={s:.4f}:end={e:.4f},asetpts=PTS-STARTPTS,"
+            f"[0:a]atrim=start_sample={a0}:end_sample={a1},asetpts=PTS-STARTPTS,"
             f"afade=t=in:d={fade}:curve=tri,afade=t=out:st={max(0, d - fade):.4f}:d={fade}:curve=tri[a{i}]"
         )
         labels.append(f"[v{i}][a{i}]")

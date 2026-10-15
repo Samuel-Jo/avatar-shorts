@@ -1,4 +1,5 @@
 import type React from 'react';
+import {CoinSplit} from './CoinSplit';
 import {CoinVault} from './CoinVault';
 import {FlowDiagram} from './FlowDiagram';
 import {TwinVault} from './TwinVault';
@@ -17,5 +18,6 @@ export const CUSTOM: Record<string, React.FC<any>> = {
   StackCarousel,
   FlowDiagram,
   CoinVault,
+  CoinSplit,
   TwinVault,
 };
