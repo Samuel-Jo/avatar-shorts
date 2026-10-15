@@ -151,10 +151,16 @@ test('자막 정렬: 대본의 1+1 을 "원 플러스 원" 소리와 맞춤', ()
   const r = sh(VENV_PY, ['-c', code], {env: PY_ENV});
   must(r.out.trim() === '원플러스원에서 투플러스원 이영이영일플러스일영', r.out.trim());
 });
-test('자막: 1+1 덤 행사 표기는 고딕 (큰 자막 세리프 1 이 l 처럼 보임)', () => {
-  // 예전: 큰 자막(Instrument Serif)에서 "1+1" 이 "l+l" 로 읽혔다 (ep03 훅)
+test('숫자는 고딕: 큰 자막·세리프 강조에서 1 이 l 처럼 보임', () => {
+  // 예전: 큰 자막(Instrument Serif)에서 "1+1" 이 "l+l", 장면의 *112만* 이 "l12만" 으로 읽혔다 (ep03·ep04 훅)
   const src = fs.readFileSync('src/captions/Captions.tsx', 'utf8');
-  must(/const DEAL = /.test(src) && (src.match(/<Deal text=/g) ?? []).length >= 3, 'Deal 이 Spans·Karaoke 에 다 안 들어감');
+  must(/DIGITS/.test(src) && (src.match(/<Deal text=/g) ?? []).length >= 3, 'Deal 이 Spans·Karaoke 에 다 안 들어감');
+  must(/isSerif \? <SansDigits/.test(fs.readFileSync('src/kit/KText.tsx', 'utf8')), 'KText 세리프 강조의 숫자가 세리프');
+});
+test('장면 카메라(camera)는 무대 밖으로 안 넘침', () => {
+  // 예전: 세로 위 판에서 camera 1.4배로 당기자 계단 그림이 판 아래로 내려와 아바타를 덮었다 (ep04-s1)
+  const src = fs.readFileSync('src/layouts/SceneHost.tsx', 'utf8');
+  must(/camera \? <div style=\{\{position: 'absolute', inset: 0, overflow: 'hidden'\}\}>/.test(src), 'camera 일 때 무대로 자르지 않음');
 });
 test('hero: 오브젝트 뒤 카드는 오브젝트 칸 안에 (무대 고정 좌표 아님)', () => {
   // 예전: 가로 무대에서 카드를 w*0.3 에 고정해, 제목이 길어 오브젝트가 왼쪽으로 밀리면 카드가 제목 첫 글자를 덮었다 (ep03-long)
