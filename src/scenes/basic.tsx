@@ -35,13 +35,14 @@ export const Hero: React.FC<HeroProps> = (p) => {
   const objSize = (wide ? 520 : 560) * u;
   return (
     <AbsoluteFill style={{...center, flexDirection: wide ? 'row' : 'column', gap: (wide ? 60 : 30) * u, padding: 60 * u}}>
-      {p.blob !== false && t.surface === 'gradient' ? (
-        // 정책 그라디언트 면: 오브젝트 뒤 카드 한 장 (글자는 올리지 않는다)
-        <GradientPanel x={wide ? w * 0.3 : w * 0.5} y={wide ? h * 0.5 : h * 0.36} w={objSize * 1.12} h={objSize * 1.12} at={oAt - 0.08} rotate={-4} />
-      ) : p.blob !== false ? (
-        <Blob x={wide ? w * 0.3 : w * 0.5} y={wide ? h * 0.5 : h * 0.36} w={objSize * 1.25} h={objSize * 1.1} rotate={-8} />
-      ) : null}
       <div style={{position: 'relative', width: objSize, height: objSize, flex: 'none'}}>
+        {/* 뒤 카드는 오브젝트 칸 안에서 오브젝트 중심에 (무대 고정 좌표로 두면 제목이 길 때 오브젝트가 밀려 카드가 글자를 덮었다, ep03-long) */}
+        {p.blob !== false && t.surface === 'gradient' ? (
+          // 정책 그라디언트 면: 오브젝트 뒤 카드 한 장 (글자는 올리지 않는다)
+          <GradientPanel x={objSize / 2} y={objSize / 2} w={objSize * 1.12} h={objSize * 1.12} at={oAt - 0.08} rotate={-4} />
+        ) : p.blob !== false ? (
+          <Blob x={objSize / 2} y={objSize / 2} w={objSize * 1.25} h={objSize * 1.1} rotate={-8} />
+        ) : null}
         <Object3D name={p.object} material={p.material} at={oAt} size={objSize} tilt={-4} />
         {p.stars !== false ? (
           <>
