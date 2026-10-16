@@ -47,6 +47,7 @@ npm run render -- <이름> --preview # 절반 해상도
 npm run render -- <이름>           # 최종 → projects/<이름>/out/final.mp4
 npm run look -- <mp4> --plan projects/<이름>/plan.json   # 훅 + 장면별 프레임 시트 (12장 넘으면 쪽으로 나눔)
 npm run chapters -- <이름>         # 롱폼: chapter 장면 → 유튜브 설명란 타임스탬프 (chapters.txt)
+npm run script-check -- <편 폴더>  # 채널 대본: 지난 편들과 같은 이음말·마무리(3~4어절)를 되풀이하는지 (projects/_channel/<편>)
 npm run matte -- <이름> [--check]  # 아바타 단색 배경 지우기 → avatar.webm(투명). 가로 = 카드 대신 사람만, 세로 = 회색 배경 대신 Backdrop. --check = 3장만 합성해 보기. 원래대로는 matte.json 삭제
 npm test                           # 자체 시험 (코드를 고쳤으면 반드시. --quick 은 스틸 렌더 생략)
 ```
@@ -121,4 +122,5 @@ render 가 plan(원본) → 편집 시간으로 옮긴다. 그래서 edit.json �
 - 롱폼 끝 "눌러주세요" 가 "눌러" 에서 잘렸다 (ep02-long). 편집이 조각 경계를 초(소수 4자리)로 넘겨 1/30 격자에서 살짝 어긋나 조각마다 프레임이 하나 더 붙고, concat 은 소리를 긴 쪽에 맞춰 늘려 80조각에 0.7초가 밀렸다 (자막·장면은 계획 시각이라 소리보다 앞서 감, ep01 롱폼도 0.5초) → `edit.py` 가 `trim=start_frame/end_frame` · `atrim=start_sample/end_sample` 로 자르고, 원본 소리가 영상보다 길면(DeepBrain 0.17초) 영상 길이까지만.
 - 대본의 "1+1" 을 아바타는 "원 플러스 원" 이라 읽는데, 정렬은 "일플러스일" 로 비교해 그 자리를 못 맞춘 글자로 셌다 (ep03) → `align.py norm` 이 1~3+1~3 덤 행사 표기를 영어 소리로. 화면에서도 세리프(`*1+1*`, 큰 자막)의 1 은 l 처럼 보여 "l+l", "l12만" (ep04) → 세리프 강조·큰 자막 안의 숫자는 고딕 (`KText SansDigits`, `Captions.tsx Deal`).
 - hero 의 오브젝트 뒤 카드를 가로 무대 고정 좌표(w×0.3)에 두어, 제목이 길면 오브젝트만 밀리고 카드가 제목 첫 글자를 덮었다 (ep03-long) → 카드는 오브젝트 칸 안 가운데.
+- 채널 대본이 편마다 같은 이음말("결론부터 말씀드리면", "그 계산이 들리려면", "나쁜 회사라는 이야기가 아닙니다", 같은 구독 부탁)을 되풀이해 "너무 AI 같다" 는 지적 (ep05) → 이음말은 그 편의 사실로, `npm run script-check` 로 지난 편과 겹치는 구절 0. 장 번호·CTA·쇼츠의 "롱폼에서 …" 같은 안내 문장은 그대로 (바꾸면 억지스럽다, 검사도 넘김).
 - 새 함정을 고치면 `scripts/selftest.mjs` 에 시험 한 줄, 이 목록에 한 줄.

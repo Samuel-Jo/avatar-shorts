@@ -12,6 +12,7 @@ import {varietyProblems} from './variety.mjs';
 import {cutStage, fitFrame, FRAME, headBox} from '../src/layouts/framing.js';
 import {avatarSideAt, mirrorX, SWAP} from '../src/layouts/sideSwap.js';
 import {PY_ENV, VENV_PY} from './platform.mjs';
+import {repeats} from './scriptcheck.mjs';
 
 const quick = process.argv.includes('--quick');
 // 이 PC 의 내 취향(style/me.json)이 시험 결과를 바꾸지 않게: 시험용 경로로 (자식 프로세스도 물려받는다)
@@ -156,6 +157,15 @@ test('숫자는 고딕: 큰 자막·세리프 강조에서 1 이 l 처럼 보임
   const src = fs.readFileSync('src/captions/Captions.tsx', 'utf8');
   must(/DIGITS/.test(src) && (src.match(/<Deal text=/g) ?? []).length >= 3, 'Deal 이 Spans·Karaoke 에 다 안 들어감');
   must(/isSerif \? <SansDigits/.test(fs.readFileSync('src/kit/KText.tsx', 'utf8')), 'KText 세리프 강조의 숫자가 세리프');
+});
+test('대본 반복 검사: 지난 편과 같은 이음말은 잡고, 숫자만 같은 건 넘김', () => {
+  // 예전: EP02~05 대본이 "결론부터 말씀드리면", "그 계산이 들리려면" 같은 이음말을 매 편 되풀이해 AI 대본처럼 들렸다 (ep05, 사용자 지적)
+  const old = {ep01: '결론부터 말씀드리면 이 돈은 사라지지 않습니다. 2024년 매출 5조 448억 원 기록'};
+  must(repeats('결론부터 말씀드리면 이 돈은 남습니다', old, 3).some((x) => x.phrase === '결론부터 말씀드리면 이'), '같은 이음말을 못 잡음');
+  must(!repeats('매출 5조 448억 원', old, 3).length, '숫자만 같은 구절까지 잡음');
+  // 장 번호·CTA·쇼츠의 '롱폼에서' 안내는 반복해도 된다 (바꾸면 억지스럽다, 사용자)
+  const cta = {ep01: '첫 번째, 공짜의 출처입니다. 댓글로 알려 주세요. 구독과 좋아요, 그리고 하이프 한 번 눌러 주세요. 롱폼에서 끝까지 따라갔습니다'};
+  must(!repeats('첫 번째, 회비의 역사입니다. 댓글로 알려 주세요. 구독과 좋아요, 그리고 하이프 한 번 눌러 주세요. 롱폼에서 끝까지 따라갔습니다', cta, 3).length, '안내 문장까지 반복으로 잡음');
 });
 test('장면 카메라(camera)는 무대 밖으로 안 넘침', () => {
   // 예전: 세로 위 판에서 camera 1.4배로 당기자 계단 그림이 판 아래로 내려와 아바타를 덮었다 (ep04-s1)

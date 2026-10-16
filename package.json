@@ -27,7 +27,8 @@
     "me": "node scripts/me.mjs",
     "words": "node scripts/words.mjs",
     "chapters": "node scripts/chapters.mjs",
-    "test": "node scripts/selftest.mjs"
+    "test": "node scripts/selftest.mjs",
+    "script-check": "node scripts/scriptcheck.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.529",
