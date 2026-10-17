@@ -152,6 +152,13 @@ test('자막 정렬: 대본의 1+1 을 "원 플러스 원" 소리와 맞춤', ()
   const r = sh(VENV_PY, ['-c', code], {env: PY_ENV});
   must(r.out.trim() === '원플러스원에서 투플러스원 이영이영일플러스일영', r.out.trim());
 });
+test('자막 정렬: 연달아 못 맞춘 단어 = 아바타 영상에서 빠진 문장 → 알림', () => {
+  // 예전: AI Studios 가 롱폼 끝 두 문장을 빼먹고 만들었는데 정렬은 "시간을 추정한 단어" 로만 지나갔다 (ep06-long)
+  const code = 'import sys; sys.path.insert(0, "scripts"); from align import dropped_runs; print(dropped_runs([3, 9, 10, 20, 21, 22, 23, 24, 25, 30]))';
+  const r = sh(VENV_PY, ['-c', code], {env: PY_ENV});
+  must(r.out.trim() === '[[20, 21, 22, 23, 24, 25]]', r.out.trim());
+  must(fs.readFileSync('scripts/align.py', 'utf8').includes('for run in dropped_runs(guessed_idx)'), 'align.py 가 빠진 문장을 알리지 않음');
+});
 test('숫자는 고딕: 큰 자막·세리프 강조에서 1 이 l 처럼 보임', () => {
   // 예전: 큰 자막(Instrument Serif)에서 "1+1" 이 "l+l", 장면의 *112만* 이 "l12만" 으로 읽혔다 (ep03·ep04 훅)
   const src = fs.readFileSync('src/captions/Captions.tsx', 'utf8');

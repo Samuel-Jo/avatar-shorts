@@ -46,6 +46,22 @@ def norm(s: str) -> str:
     return re.sub(r"[^0-9a-z가-힣]", "", s)
 
 
+DROP_RUN = 6  # 숫자 표기 차이는 1~2단어씩 못 맞춘다. 이만큼 연달아면 소리에 없는 것 (ep06-long: 아바타 도구가 두 문장을 빼먹음)
+
+
+def dropped_runs(idx: list[int], min_run: int = DROP_RUN) -> list[list[int]]:
+    """못 맞춘 토큰 번호 중 연달아 min_run 개 이상인 묶음"""
+    runs, cur = [], []
+    for i in idx:
+        if cur and i != cur[-1] + 1:
+            runs.append(cur)
+            cur = []
+        cur.append(i)
+    if cur:
+        runs.append(cur)
+    return [r for r in runs if len(r) >= min_run]
+
+
 def parse_script(text: str):
     cues = []
     for raw in text.splitlines():
@@ -111,6 +127,7 @@ def main():
 
     # 못 맞춘 토큰 보간
     guessed = []
+    guessed_idx = []
     total_end = raw[-1]["end"] if raw else 0
     for i, tk in enumerate(tokens):
         if tk["start"] is not None:
@@ -123,6 +140,7 @@ def main():
         tk["start"] = prev_end + step * 0.1
         tk["end"] = tk["start"] + step * 0.9
         guessed.append(tk["text"])
+        guessed_idx.append(i)
     for i in range(1, len(tokens)):  # 단조 증가 보장
         if tokens[i]["start"] < tokens[i - 1]["start"]:
             tokens[i]["start"] = tokens[i - 1]["start"] + 0.01
@@ -156,6 +174,9 @@ def main():
     print(f"자막 {len(out)}개, 단어 {len(words)}개 정렬 완료 (글자 일치율 {rate:.0%})")
     if guessed:
         print("시간을 추정한 단어:", ", ".join(guessed[:40]))
+    for run in dropped_runs(guessed_idx):
+        print(f"⚠️  대본 {len(run)}단어가 연달아 소리에서 안 들립니다 (원본 {tokens[run[0]]['start']:.1f}초 부근: "
+              f"\"{' '.join(tokens[j]['text'] for j in run[:8])}…\") — 아바타 영상에서 문장이 빠졌을 수 있어요. 그 구간을 직접 들어 보세요")
     if rate < 0.7:
         print("⚠️  일치율이 낮습니다. script.txt 가 실제 말과 많이 다른지 확인하세요.")
     long = [c for c in out if len(c["text"]) > 18]
