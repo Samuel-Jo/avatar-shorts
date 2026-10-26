@@ -46,7 +46,7 @@ argument-hint: <영상 경로> [대본]
 3. 주제를 보고 `look.palette` 가 auto 면 `projects/<이름>/taste.json` 에 `{"look": {"palette": "..."}}` 로 정해 둔다.
 
 ## ② 자막 → `transcribe-ko`
-받아쓰기 → 교정(`script.txt`) → `align.py`. 고친 곳은 결정 요약에 표로.
+받아쓰기 → 교정(`script.txt`) → `align.py`. 고친 곳은 결정 요약에 표로. align 이 ❌ 로 멈추면(대본 줄이 소리에 없음) 그냥 넘기지 말고 `transcribe-ko` 3대로.
 
 ## ③ 말 편집 → `viral-edit`
 `edit.structure` 가 hook-first 면 `edit.json` 을 쓰고, `npm run edit -- <이름>`. 무음 제거는 항상 (정도는 취향).

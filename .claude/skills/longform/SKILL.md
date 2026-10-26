@@ -49,7 +49,7 @@ argument-hint: <가로 영상 경로> [대본 경로]
 - **채널 기본은 카드 없이 사람만** (2026-10-14 사용자: 카드가 증명사진 같아 어색). 편집(③) 뒤에 `npm run matte -- <편>-long --check` → `frames/matte_check.png` 에서 머리카락·깃 구멍을 보고 `npm run matte -- <편>-long` (6분 영상 약 12분). 배경이 단색이 아니면 matte 가 멈추고 카드로 남는다. 편집을 다시 하면 matte 도 다시. **쇼츠 3개도 같이** (`npm run matte -- <편>-s1` …, 편당 2~3분): 세로는 배치 그대로 회색 배경만 크림 바탕으로.
 
 ## ② 자막
-`transcribe-ko` 그대로. 대본이 있으니 `script.txt` 는 대본에서 만들고(한 줄 18자 안팎), `npm run align` 일치율 90% 이상을 확인한다. 9분이면 받아쓰기에 몇 분 걸리고, 그동안 출력이 없다.
+`transcribe-ko` 그대로. 대본이 있으니 `script.txt` 는 대본에서 만들고(한 줄 18자 안팎), `npm run align` 일치율 90% 이상을 확인한다. align 이 ❌ 로 멈추면 아바타 영상에서 문장이 빠진 것 — `transcribe-ko` 3의 순서대로. 9분이면 받아쓰기에 몇 분 걸리고, 그동안 출력이 없다.
 
 ## ③ 말 편집 — 순서는 그대로
 `projects/<편>-long/taste.json`:
