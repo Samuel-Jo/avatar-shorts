@@ -159,6 +159,29 @@ test('자막 정렬: 연달아 못 맞춘 단어 = 아바타 영상에서 빠진
   must(r.out.trim() === '[[20, 21, 22, 23, 24, 25]]', r.out.trim());
   must(fs.readFileSync('scripts/align.py', 'utf8').includes('for run in dropped_runs(guessed_idx)'), 'align.py 가 빠진 문장을 알리지 않음');
 });
+test('자막 정렬: 대본 한 줄이 통째로 소리에 없으면 멈춤 (--allow-missing 이면 지나감)', () => {
+  // 예전: AI Studios 가 한 문장을 빼고 첫 낱말 "계약서"만 남겼는데 정렬은 ⚠️ 만 찍고 지나갔다 (ep15-long)
+  const D = path.join('projects', '.selftest-align');
+  fs.rmSync(D, {recursive: true, force: true});
+  fs.mkdirSync(D, {recursive: true});
+  const said = ['관리비 고지서는 세 칸으로', '나뉘어 있어요', '셋째 칸을 먼저 보세요'];
+  let t = 0;
+  const raw = said.flatMap((l) => l.split(' ')).map((w) => ({text: w, start: t, end: (t += 0.5) - 0.05}));
+  fs.writeFileSync(path.join(D, 'words.raw.json'), JSON.stringify(raw));
+  const align = (lines, ...flags) => {
+    fs.writeFileSync(path.join(D, 'script.txt'), lines.join('\n'));
+    fs.rmSync(path.join(D, 'words.json'), {force: true});
+    return sh(VENV_PY, ['scripts/align.py', D, ...flags], {env: PY_ENV});
+  };
+  const ok = align(said);
+  must(ok.code === 0 && !ok.out.includes('❌') && fs.existsSync(path.join(D, 'words.json')), `다 말한 대본에서 멈춤: ${ok.out.trim()}`);
+  const lost = [said[0], said[1], '계약서는 맺은 날부터 한 달 안에 걸어야 해요', said[2]];
+  const bad = align(lost);
+  must(bad.code !== 0 && bad.out.includes('3번째 줄') && !fs.existsSync(path.join(D, 'words.json')), `빠진 줄을 못 잡음: ${bad.out.trim()}`);
+  must(align(lost, '--allow-missing').code === 0, '--allow-missing 인데 멈춤');
+  must(align([...lost.slice(0, 2), `# ${lost[2]}`, lost[3]]).code === 0, '# 로 막은 줄에서 멈춤');
+  fs.rmSync(D, {recursive: true, force: true});
+});
 test('숫자는 고딕: 큰 자막·세리프 강조에서 1 이 l 처럼 보임', () => {
   // 예전: 큰 자막(Instrument Serif)에서 "1+1" 이 "l+l", 장면의 *112만* 이 "l12만" 으로 읽혔다 (ep03·ep04 훅)
   const src = fs.readFileSync('src/captions/Captions.tsx', 'utf8');
